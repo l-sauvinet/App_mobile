@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:views="clr-namespace:AppMobile.Views"
+       x:Class="AppMobile.AppShell"
+       Shell.BackgroundColor="#263040"
+       Shell.ForegroundColor="White"
+       Shell.TitleColor="White"
+       Shell.TabBarBackgroundColor="#263040"
+       Shell.TabBarForegroundColor="White"
+       Shell.TabBarUnselectedColor="#94a3b8"
+       Shell.TabBarTitleColor="White">
+
+    <!-- Page de login (hors tabs) -->
+    <ShellContent Route="login" Shell.NavBarIsVisible="False"
+                  ContentTemplate="{DataTemplate views:LoginPage}"/>
+
+    <!-- Navigation principale (tabs) -->
+    <TabBar>
+        <ShellContent Title="Mes Cours" Route="courses"
+                      ContentTemplate="{DataTemplate views:CoursesPage}"/>
+        <ShellContent Title="Réservations" Route="rooms"
+                      ContentTemplate="{DataTemplate views:RoomPage}"/>
+    </TabBar>
+
+</Shell>

@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppMobile.ViewModels"
+             xmlns:models="clr-namespace:AppMobile.Models"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
+             x:Class="AppMobile.Views.RoomPage"
+             x:DataType="vm:RoomViewModel"
+             BackgroundColor="#f3f4f6"
+             Title="Réservation de salle">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- Header navy -->
+            <Frame BackgroundColor="#263040" CornerRadius="0" Padding="20,16" HasShadow="False">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Réserver une salle" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                    <Label Text="Gérez vos réservations de salles" FontSize="13" TextColor="#94a3b8"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Messages -->
+            <Frame IsVisible="{Binding SuccessMessage, Converter={StaticResource IsNotEmptyConverter}}"
+                   BackgroundColor="#dcfce7" CornerRadius="0" Padding="16,10" HasShadow="False">
+                <Label Text="{Binding SuccessMessage}" TextColor="#16a34a" FontSize="13"/>
+            </Frame>
+            <Frame IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotEmptyConverter}}"
+                   BackgroundColor="#fee2e2" CornerRadius="0" Padding="16,10" HasShadow="False">
+                <Label Text="{Binding ErrorMessage}" TextColor="#dc2626" FontSize="13"/>
+            </Frame>
+
+            <!-- Formulaire de réservation -->
+            <Frame Margin="16,16,16,0" Padding="20" CornerRadius="14"
+                   BackgroundColor="White" HasShadow="False">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Nouvelle réservation" FontSize="17"
+                           FontAttributes="Bold" TextColor="#1e293b"/>
+
+                    <!-- Salle -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Salle" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>
+                        <Frame Padding="4,0" CornerRadius="10" HasShadow="False"
+                               BorderColor="#e2e8f0" BackgroundColor="#f8fafc">
+                            <Picker ItemsSource="{Binding Rooms}"
+                                    SelectedItem="{Binding SelectedRoom}"
+                                    ItemDisplayBinding="{Binding Display}"
+                                    Title="Choisir une salle"
+                                    BackgroundColor="Transparent"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Date -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Date" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>
+                        <Frame Padding="4,0" CornerRadius="10" HasShadow="False"
+                               BorderColor="#e2e8f0" BackgroundColor="#f8fafc">
+                            <DatePicker Date="{Binding SelectedDate}"
+                                        MinimumDate="{x:Static sys:DateTime.Today}"
+                                        BackgroundColor="Transparent"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Horaires -->
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Grid.Column="0" Spacing="6">
+                            <Label Text="Début" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>
+                            <Frame Padding="4,0" CornerRadius="10" HasShadow="False"
+                                   BorderColor="#e2e8f0" BackgroundColor="#f8fafc">
+                                <TimePicker Time="{Binding StartTime}" BackgroundColor="Transparent"/>
+                            </Frame>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Fin" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>
+                            <Frame Padding="4,0" CornerRadius="10" HasShadow="False"
+                                   BorderColor="#e2e8f0" BackgroundColor="#f8fafc">
+                                <TimePicker Time="{Binding EndTime}" BackgroundColor="Transparent"/>
+                            </Frame>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <!-- Motif -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Motif (optionnel)" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>
+                        <Frame Padding="0" CornerRadius="10" HasShadow="False"
+                               BorderColor="#e2e8f0" BackgroundColor="#f8fafc">
+                            <Entry Text="{Binding Reason}" Placeholder="Ex: Cours de rattrapage"
+                                   BackgroundColor="Transparent" Margin="8,0"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <Button Text="Réserver" Command="{Binding ReserveCommand}"
+                            BackgroundColor="#263040" TextColor="White"
+                            CornerRadius="10" HeightRequest="50"
+                            FontAttributes="Bold" FontSize="16"/>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Mes réservations -->
+            <Frame Margin="16,16,16,16" Padding="20" CornerRadius="14"
+                   BackgroundColor="White" HasShadow="False">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Mes réservations à venir" FontSize="17"
+                           FontAttributes="Bold" TextColor="#1e293b"/>
+
+                    <CollectionView ItemsSource="{Binding MyReservations}">
+                        <CollectionView.EmptyView>
+                            <Label Text="Aucune réservation à venir." TextColor="#94a3b8"
+                                   FontSize="14" HorizontalOptions="Center" Margin="0,8"/>
+                        </CollectionView.EmptyView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="models:RoomReservation">
+                                <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,12"
+                                      ColumnSpacing="8">
+                                    <Frame Grid.Column="0" Padding="12" CornerRadius="10"
+                                           BackgroundColor="#f8fafc" HasShadow="False">
+                                        <VerticalStackLayout Spacing="3">
+                                            <Label Text="{Binding RoomName}" FontAttributes="Bold"
+                                                   FontSize="14" TextColor="#1e293b"/>
+                                            <Label Text="{Binding DateDisplay}" FontSize="12" TextColor="#64748b"/>
+                                            <Label Text="{Binding TimeRange}" FontSize="12" TextColor="#475569"/>
+                                            <Label Text="{Binding Reason}" FontSize="12" TextColor="#94a3b8"
+                                                   IsVisible="{Binding Reason, Converter={StaticResource IsNotEmptyConverter}}"/>
+                                        </VerticalStackLayout>
+                                    </Frame>
+                                    <Button Grid.Column="1" Text="✕"
+                                            Command="{Binding Source={RelativeSource AncestorType={x:Type vm:RoomViewModel}}, Path=DeleteReservationCommand}"
+                                            CommandParameter="{Binding .}"
+                                            BackgroundColor="#fee2e2" TextColor="#dc2626"
+                                            CornerRadius="8" WidthRequest="40" HeightRequest="40"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

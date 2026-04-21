@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppMobile.ViewModels"
+             xmlns:models="clr-namespace:AppMobile.Models"
+             x:Class="AppMobile.Views.CoursesPage"
+             x:DataType="vm:CoursesViewModel"
+             BackgroundColor="#f3f4f6"
+             Title="Mes Cours">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto" Padding="0,0,8,0">
+            <Label Text="{Binding WelcomeMessage}" TextColor="White"
+                   FontAttributes="Bold" FontSize="16" VerticalOptions="Center"/>
+            <Button Grid.Column="1" Text="Déconnexion" Command="{Binding LogoutCommand}"
+                    BackgroundColor="Transparent" TextColor="#94a3b8" FontSize="13"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- Header navy -->
+        <Frame Grid.Row="0" BackgroundColor="#263040" CornerRadius="0" Padding="20,16" HasShadow="False">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Mes cours" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                <Label Text="Sélectionnez un cours pour gérer les présences"
+                       FontSize="13" TextColor="#94a3b8"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <!-- Liste des cours -->
+        <RefreshView Grid.Row="1" Command="{Binding LoadCoursesCommand}"
+                     IsRefreshing="{Binding IsLoading}" RefreshColor="#263040">
+            <CollectionView ItemsSource="{Binding Courses}" Margin="16,12">
+
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Margin="0,60,0,0">
+                        <Label Text="{Binding ErrorMessage}" TextColor="#64748b"
+                               FontSize="15" HorizontalOptions="Center"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Course">
+                        <Frame Margin="0,0,0,12" Padding="16" CornerRadius="14"
+                               BackgroundColor="White" HasShadow="True">
+                            <Frame.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CoursesViewModel}}, Path=SelectCourseCommand}"
+                                                      CommandParameter="{Binding .}"/>
+                            </Frame.GestureRecognizers>
+                            <Grid ColumnDefinitions="4,*,Auto" ColumnSpacing="12">
+                                <!-- Barre colorée gauche -->
+                                <BoxView Grid.Column="0" BackgroundColor="#263040" CornerRadius="2"/>
+                                <!-- Infos -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="{Binding Display}" FontSize="16"
+                                           FontAttributes="Bold" TextColor="#1e293b"/>
+                                    <Label Text="{Binding DateDisplay}" FontSize="13" TextColor="#64748b"/>
+                                    <Label Text="{Binding TimeRange}" FontSize="13" TextColor="#475569"/>
+                                </VerticalStackLayout>
+                                <!-- Flèche -->
+                                <Label Grid.Column="2" Text="›" FontSize="24"
+                                       TextColor="#94a3b8" VerticalOptions="Center"/>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+
+        <!-- Loading -->
+        <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#263040" HorizontalOptions="Center" VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

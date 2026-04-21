@@ -1,0 +1,15 @@
+# .NET
+bin/
+obj/
+.vs/
+
+# Node
+node_modules/
+dist/
+build/
+
+# Logs
+*.log
+
+# Env
+.env

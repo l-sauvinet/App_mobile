@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(dotnet workload *)",
+      "Bash(dotnet new maui *)",
+      "Bash(dotnet build *)",
+      "Bash(dotnet add *)",
+      "Bash(taskkill /F /PID 12348)",
+      "Bash(powershell *)",
+      "Bash(dotnet run *)",
+      "Bash(\"E:\\\\Dev\\\\App_mobile\\\\bin\\\\Debug\\\\net10.0-windows10.0.19041.0\\\\win-x64\\\\AppMobile.exe\")",
+      "Bash(echo \"Exit: $?\")",
+      "Bash('\"$dump')",
+      "Bash(dotnet clean *)",
+      "Bash(mysql *)",
+      "Bash(where mysql *)",
+      "Bash(npm install *)"
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:AppMobile.ViewModels"
+             xmlns:models="clr-namespace:AppMobile.Models"
+             x:Class="AppMobile.Views.AttendancePage"
+             x:DataType="vm:AttendanceViewModel"
+             BackgroundColor="#f3f4f6"
+             Title="Présences">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
+
+        <Frame Grid.Row="0" BackgroundColor="#263040" CornerRadius="0" Padding="20,16" HasShadow="False">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="{Binding CourseName}" FontSize="18" FontAttributes="Bold" TextColor="White"/>
+                <Label Text="{Binding TimeRange}" FontSize="13" TextColor="#94a3b8"/>
+            </VerticalStackLayout>
+        </Frame>
+
+        <Frame Grid.Row="1"
+               IsVisible="{Binding SuccessMessage, Converter={StaticResource IsNotEmptyConverter}}"
+               BackgroundColor="#dcfce7" CornerRadius="0" Padding="16,10" HasShadow="False">
+            <Label Text="{Binding SuccessMessage}" TextColor="#16a34a" FontSize="13"/>
+        </Frame>
+
+        <Frame Grid.Row="2"
+               IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotEmptyConverter}}"
+               BackgroundColor="#fee2e2" CornerRadius="0" Padding="16,10" HasShadow="False">
+            <Label Text="{Binding ErrorMessage}" TextColor="#dc2626" FontSize="13"/>
+        </Frame>
+
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Students}" Margin="16,12">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Student">
+                    <Frame Margin="0,0,0,10" Padding="16" CornerRadius="12"
+                           BackgroundColor="White" HasShadow="False">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+
+                            <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                                <Label Text="{Binding FullName}" FontSize="15"
+                                       FontAttributes="Bold" TextColor="#1e293b"/>
+                                <Frame IsVisible="{Binding IsLate}"
+                                       BackgroundColor="#fef9c3" CornerRadius="6"
+                                       Padding="8,2" HasShadow="False" HorizontalOptions="Start">
+                                    <Label Text="Retard" TextColor="#854d0e" FontSize="11" FontAttributes="Bold"/>
+                                </Frame>
+                                <Frame IsVisible="{Binding IsAbsent}"
+                                       BackgroundColor="#fee2e2" CornerRadius="6"
+                                       Padding="8,2" HasShadow="False" HorizontalOptions="Start">
+                                    <Label Text="Absent" TextColor="#991b1b" FontSize="11" FontAttributes="Bold"/>
+                                </Frame>
+                            </VerticalStackLayout>
+
+                            <Button Grid.Column="1" Text="Retard"
+                                    Clicked="OnLateClicked"
+                                    BackgroundColor="{Binding IsLate, Converter={StaticResource BoolToLateColorConverter}}"
+                                    TextColor="White" CornerRadius="8"
+                                    FontSize="12" HeightRequest="38" WidthRequest="70"/>
+
+                            <Button Grid.Column="2" Text="Absent"
+                                    Clicked="OnAbsentClicked"
+                                    BackgroundColor="{Binding IsAbsent, Converter={StaticResource BoolToAbsentColorConverter}}"
+                                    TextColor="White" CornerRadius="8"
+                                    FontSize="12" HeightRequest="38" WidthRequest="70"/>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <ActivityIndicator Grid.Row="3" IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#263040" HorizontalOptions="Center" VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

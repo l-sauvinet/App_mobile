@@ -6,7 +6,11 @@ public class ApiService
 {
     public readonly HttpClient Http;
 
+#if ANDROID
+    public const string BaseUrl = "http://10.0.2.2:3001";
+#else
     public const string BaseUrl = "http://localhost:3001";
+#endif
 
     public ApiService()
     {

@@ -5,7 +5,7 @@
              xmlns:models="clr-namespace:AppMobile.Models"
              x:Class="AppMobile.Views.CoursesPage"
              x:DataType="vm:CoursesViewModel"
-             BackgroundColor="#f3f4f6"
+             BackgroundColor="#f1f5f9"
              Title="Mes Cours">
 
     <Shell.TitleView>
@@ -19,58 +19,182 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- Header navy -->
-        <Frame Grid.Row="0" BackgroundColor="#263040" CornerRadius="0" Padding="20,16" HasShadow="False">
-            <VerticalStackLayout Spacing="4">
-                <Label Text="Mes cours" FontSize="22" FontAttributes="Bold" TextColor="White"/>
-                <Label Text="Sélectionnez un cours pour gérer les présences"
-                       FontSize="13" TextColor="#94a3b8"/>
-            </VerticalStackLayout>
-        </Frame>
+        <!-- ─── Calendrier ─── -->
+        <Grid Grid.Row="0" BackgroundColor="#1e2d40" Padding="0,0,0,20">
+            <VerticalStackLayout Spacing="0">
 
-        <!-- Liste des cours -->
-        <RefreshView Grid.Row="1" Command="{Binding LoadCoursesCommand}"
-                     IsRefreshing="{Binding IsLoading}" RefreshColor="#263040">
-            <CollectionView ItemsSource="{Binding Courses}" Margin="16,12">
+                <!-- Navigation mois -->
+                <Grid ColumnDefinitions="48,*,48" Padding="4,12,4,4">
+                    <Button Grid.Column="0" Text="‹" FontSize="24" TextColor="White"
+                            BackgroundColor="Transparent" Command="{Binding PreviousWeekCommand}"
+                            HeightRequest="44" WidthRequest="44" Padding="0"/>
+                    <Label Grid.Column="1" Text="{Binding MonthYearLabel}"
+                           FontSize="18" FontAttributes="Bold" TextColor="White"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Button Grid.Column="2" Text="›" FontSize="24" TextColor="White"
+                            BackgroundColor="Transparent" Command="{Binding NextWeekCommand}"
+                            HeightRequest="44" WidthRequest="44" Padding="0"/>
+                </Grid>
 
-                <CollectionView.EmptyView>
-                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="8" Margin="0,60,0,0">
-                        <Label Text="{Binding ErrorMessage}" TextColor="#64748b"
-                               FontSize="15" HorizontalOptions="Center"/>
-                    </VerticalStackLayout>
-                </CollectionView.EmptyView>
+                <!-- Bande des 7 jours -->
+                <CollectionView ItemsSource="{Binding WeekDays}"
+                                ItemsLayout="HorizontalList"
+                                HeightRequest="80"
+                                HorizontalOptions="Center">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:CalendarDay">
+                            <Grid WidthRequest="48" HeightRequest="80">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectDayCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Grid.GestureRecognizers>
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="4">
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Course">
-                        <Frame Margin="0,0,0,12" Padding="16" CornerRadius="14"
-                               BackgroundColor="White" HasShadow="True">
-                            <Frame.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CoursesViewModel}}, Path=SelectCourseCommand}"
-                                                      CommandParameter="{Binding .}"/>
-                            </Frame.GestureRecognizers>
-                            <Grid ColumnDefinitions="4,*,Auto" ColumnSpacing="12">
-                                <!-- Barre colorée gauche -->
-                                <BoxView Grid.Column="0" BackgroundColor="#263040" CornerRadius="2"/>
-                                <!-- Infos -->
-                                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                                    <Label Text="{Binding Display}" FontSize="16"
-                                           FontAttributes="Bold" TextColor="#1e293b"/>
-                                    <Label Text="{Binding DateDisplay}" FontSize="13" TextColor="#64748b"/>
-                                    <Label Text="{Binding TimeRange}" FontSize="13" TextColor="#475569"/>
+                                    <!-- Abréviation du jour -->
+                                    <Label Text="{Binding ShortDay}" FontSize="10" FontAttributes="Bold"
+                                           TextColor="#64748b" HorizontalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="TextColor" Value="#93c5fd"/>
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+
+                                    <!-- Cercle avec numéro -->
+                                    <Border WidthRequest="38" HeightRequest="38" StrokeThickness="0"
+                                            BackgroundColor="Transparent" HorizontalOptions="Center">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="19"/>
+                                        </Border.StrokeShape>
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="White"/>
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label Text="{Binding DayNumber}" FontSize="16" TextColor="#cbd5e1"
+                                               HorizontalOptions="Center" VerticalOptions="Center">
+                                            <Label.Triggers>
+                                                <DataTrigger TargetType="Label" Binding="{Binding IsSelected}" Value="True">
+                                                    <Setter Property="TextColor" Value="#1e2d40"/>
+                                                    <Setter Property="FontAttributes" Value="Bold"/>
+                                                </DataTrigger>
+                                            </Label.Triggers>
+                                        </Label>
+                                    </Border>
+
+                                    <!-- Point "aujourd'hui" -->
+                                    <BoxView WidthRequest="5" HeightRequest="5" CornerRadius="3"
+                                             HorizontalOptions="Center" Color="Transparent">
+                                        <BoxView.Triggers>
+                                            <DataTrigger TargetType="BoxView" Binding="{Binding IsToday}" Value="True">
+                                                <Setter Property="Color" Value="#60a5fa"/>
+                                            </DataTrigger>
+                                        </BoxView.Triggers>
+                                    </BoxView>
+
                                 </VerticalStackLayout>
-                                <!-- Flèche -->
-                                <Label Grid.Column="2" Text="›" FontSize="24"
-                                       TextColor="#94a3b8" VerticalOptions="Center"/>
                             </Grid>
-                        </Frame>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </RefreshView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-        <!-- Loading -->
-        <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsLoading}"
-                           IsVisible="{Binding IsLoading}"
-                           Color="#263040" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- ─── Cours du jour ─── -->
+        <Grid Grid.Row="1" RowDefinitions="Auto,*">
+
+            <!-- En-tête jour sélectionné -->
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Padding="20,16,20,8">
+                <Label Grid.Column="0" Text="{Binding SelectedDayLabel}"
+                       FontSize="18" FontAttributes="Bold" TextColor="#1e293b"/>
+                <Border Grid.Column="1" StrokeThickness="0" Padding="10,5" VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+                    <Border.Triggers>
+                        <DataTrigger TargetType="Border" Binding="{Binding DaySummaryLabel}" Value="Aucun cours">
+                            <Setter Property="BackgroundColor" Value="#f1f5f9"/>
+                        </DataTrigger>
+                    </Border.Triggers>
+                    <Border.BackgroundColor>#e0e7ff</Border.BackgroundColor>
+                    <Label Text="{Binding DaySummaryLabel}" FontSize="12"
+                           FontAttributes="Bold" TextColor="#4f46e5">
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding DaySummaryLabel}" Value="Aucun cours">
+                                <Setter Property="TextColor" Value="#94a3b8"/>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </Border>
+            </Grid>
+
+            <!-- Liste des cours -->
+            <RefreshView Grid.Row="1" Command="{Binding LoadCoursesCommand}"
+                         IsRefreshing="{Binding IsLoading}" RefreshColor="#263040">
+                <CollectionView ItemsSource="{Binding CoursesForDay}" Margin="0,4,0,16">
+
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center"
+                                             Spacing="8" Margin="0,80,0,0">
+                            <Label Text="Pas de cours ce jour" TextColor="#94a3b8"
+                                   FontSize="15" HorizontalOptions="Center"/>
+                            <Label Text="Tirez vers le bas pour actualiser"
+                                   TextColor="#cbd5e1" FontSize="12" HorizontalOptions="Center"/>
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Course">
+                            <Border Margin="16,0,16,12" BackgroundColor="White" StrokeThickness="0">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="14"/>
+                                </Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectCourseCommand}"
+                                        CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="5,*,Auto" ColumnSpacing="0">
+
+                                    <!-- Barre accent gauche -->
+                                    <BoxView Grid.Column="0" BackgroundColor="#263040" CornerRadius="7"/>
+
+                                    <!-- Infos cours -->
+                                    <VerticalStackLayout Grid.Column="1" Padding="14,14,8,14" Spacing="5">
+                                        <Label Text="{Binding Display}" FontSize="15" FontAttributes="Bold"
+                                               TextColor="#1e293b" LineBreakMode="TailTruncation"/>
+                                        <Label Text="{Binding RoomName}" FontSize="13" TextColor="#64748b"/>
+                                    </VerticalStackLayout>
+
+                                    <!-- Heure + durée -->
+                                    <VerticalStackLayout Grid.Column="2" Padding="0,14,14,14"
+                                                         VerticalOptions="Center" Spacing="4">
+                                        <Border StrokeThickness="0" Padding="8,4"
+                                                BackgroundColor="#eff6ff" HorizontalOptions="End">
+                                            <Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="8"/>
+                                            </Border.StrokeShape>
+                                            <Label Text="{Binding StartHour}" FontSize="13"
+                                                   FontAttributes="Bold" TextColor="#2563eb"/>
+                                        </Border>
+                                        <Label Text="{Binding Duration}" FontSize="12"
+                                               TextColor="#94a3b8" HorizontalOptions="Center"/>
+                                    </VerticalStackLayout>
+
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+
+            <!-- Loader -->
+            <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsLoading}"
+                               IsVisible="{Binding IsLoading}"
+                               Color="#263040" HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Grid>
+
     </Grid>
 </ContentPage>

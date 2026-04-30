@@ -52,13 +52,15 @@
                             </VerticalStackLayout>
 
                             <Button Grid.Column="1" Text="Retard"
-                                    Clicked="OnLateClicked"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleLateCommand}"
+                                    CommandParameter="{Binding .}"
                                     BackgroundColor="{Binding IsLate, Converter={StaticResource BoolToLateColorConverter}}"
                                     TextColor="White" CornerRadius="8"
                                     FontSize="12" HeightRequest="38" WidthRequest="70"/>
 
                             <Button Grid.Column="2" Text="Absent"
-                                    Clicked="OnAbsentClicked"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.ToggleAbsentCommand}"
+                                    CommandParameter="{Binding .}"
                                     BackgroundColor="{Binding IsAbsent, Converter={StaticResource BoolToAbsentColorConverter}}"
                                     TextColor="White" CornerRadius="8"
                                     FontSize="12" HeightRequest="38" WidthRequest="70"/>

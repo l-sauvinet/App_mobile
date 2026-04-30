@@ -10,10 +10,13 @@ namespace AppMobile.ViewModels;
 public partial class RoomViewModel : ObservableObject
 {
     private readonly RoomService _roomService;
+    private readonly AbsenceService _absenceService;
 
     [ObservableProperty] private ObservableCollection<Room> _rooms = [];
     [ObservableProperty] private ObservableCollection<RoomReservation> _myReservations = [];
+    [ObservableProperty] private ObservableCollection<SchoolClass> _classes = [];
     [ObservableProperty] private Room? _selectedRoom;
+    [ObservableProperty] private SchoolClass? _selectedClass;
     [ObservableProperty] private DateTime _selectedDate = DateTime.Today;
     [ObservableProperty] private TimeSpan _startTime = new(8, 0, 0);
     [ObservableProperty] private TimeSpan _endTime = new(10, 0, 0);
@@ -22,9 +25,10 @@ public partial class RoomViewModel : ObservableObject
     [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private string _successMessage = string.Empty;
 
-    public RoomViewModel(RoomService roomService)
+    public RoomViewModel(RoomService roomService, AbsenceService absenceService)
     {
         _roomService = roomService;
+        _absenceService = absenceService;
     }
 
     [RelayCommand]
@@ -35,13 +39,17 @@ public partial class RoomViewModel : ObservableObject
 
         try
         {
-            var rooms = await _roomService.GetRoomsAsync();
-            Rooms = new ObservableCollection<Room>(rooms);
+            var roomsTask = _roomService.GetRoomsAsync();
+            var classesTask = _absenceService.GetTeacherClassesAsync();
+            await Task.WhenAll(roomsTask, classesTask);
+
+            Rooms = new ObservableCollection<Room>(roomsTask.Result);
+            Classes = new ObservableCollection<SchoolClass>(classesTask.Result);
             await LoadReservationsAsync();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            ErrorMessage = "Erreur lors du chargement.";
+            ErrorMessage = $"Erreur lors du chargement : {ex.Message}";
         }
         finally
         {
@@ -83,9 +91,10 @@ public partial class RoomViewModel : ObservableObject
 
         try
         {
-            await _roomService.CreateReservationAsync(SelectedRoom.Id, start, end, Reason);
+            await _roomService.CreateReservationAsync(SelectedRoom.Id, start, end, Reason, SelectedClass?.Id);
             await LoadReservationsAsync();
             Reason = string.Empty;
+            SelectedClass = null;
             ShowSuccess("Réservation confirmée !");
         }
         catch (Exception ex)

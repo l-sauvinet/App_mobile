@@ -3,20 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:AppMobile.ViewModels"
              xmlns:models="clr-namespace:AppMobile.Models"
-             x:Class="AppMobile.Views.AttendancePage"
-             x:DataType="vm:AttendanceViewModel"
+             x:Class="AppMobile.Views.ReservationAttendancePage"
+             x:DataType="vm:ReservationAttendanceViewModel"
              BackgroundColor="#f3f4f6"
              Title="">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*">
+    <Grid RowDefinitions="Auto,Auto,Auto,*">
 
         <!-- En-tête -->
-        <Frame Grid.Row="0" BackgroundColor="#263040" CornerRadius="0" Padding="20,16" HasShadow="False">
+        <Frame Grid.Row="0" BackgroundColor="#0d9488" CornerRadius="0" Padding="20,16" HasShadow="False">
             <Grid ColumnDefinitions="*,44">
                 <VerticalStackLayout Spacing="4" VerticalOptions="Center">
-                    <Label Text="{Binding CourseName}" FontSize="18" FontAttributes="Bold" TextColor="White"
+                    <Label Text="{Binding RoomName}" FontSize="18" FontAttributes="Bold" TextColor="White"
                            LineBreakMode="TailTruncation"/>
-                    <Label Text="{Binding TimeRange}" FontSize="13" TextColor="#94a3b8"/>
+                    <Label Text="{Binding TimeRange}" FontSize="13" TextColor="#ccfbf1"/>
+                    <Label Text="{Binding ClassName}" FontSize="12" TextColor="#99f6e4"
+                           IsVisible="{Binding ClassName, Converter={StaticResource IsNotEmptyConverter}}"/>
                 </VerticalStackLayout>
                 <Button Grid.Column="1" Text="✕" Command="{Binding CloseCommand}"
                         BackgroundColor="Transparent" TextColor="White"
@@ -25,43 +27,28 @@
             </Grid>
         </Frame>
 
-        <!-- Sélecteur de classe -->
-        <Frame Grid.Row="1" BackgroundColor="#1e2d40" CornerRadius="0" Padding="16,6" HasShadow="False">
-            <Grid ColumnDefinitions="Auto,*">
-                <Label Text="Classe :" FontSize="13" TextColor="#94a3b8"
-                       VerticalOptions="Center" Margin="0,0,8,0"/>
-                <Picker Grid.Column="1"
-                        ItemsSource="{Binding Classes}"
-                        SelectedItem="{Binding SelectedClass}"
-                        ItemDisplayBinding="{Binding Name}"
-                        Title="Classe du cours"
-                        TextColor="White" TitleColor="#64748b"
-                        BackgroundColor="Transparent"/>
-            </Grid>
-        </Frame>
-
         <!-- Message succès -->
-        <Frame Grid.Row="2"
+        <Frame Grid.Row="1"
                IsVisible="{Binding SuccessMessage, Converter={StaticResource IsNotEmptyConverter}}"
                BackgroundColor="#dcfce7" CornerRadius="0" Padding="16,10" HasShadow="False">
             <Label Text="{Binding SuccessMessage}" TextColor="#16a34a" FontSize="13"/>
         </Frame>
 
         <!-- Message erreur -->
-        <Frame Grid.Row="3"
+        <Frame Grid.Row="2"
                IsVisible="{Binding ErrorMessage, Converter={StaticResource IsNotEmptyConverter}}"
                BackgroundColor="#fee2e2" CornerRadius="0" Padding="16,10" HasShadow="False">
             <Label Text="{Binding ErrorMessage}" TextColor="#dc2626" FontSize="13"/>
         </Frame>
 
         <!-- Liste des élèves -->
-        <CollectionView Grid.Row="4" ItemsSource="{Binding Students}" Margin="16,12">
+        <CollectionView Grid.Row="3" ItemsSource="{Binding Students}" Margin="16,12">
             <CollectionView.EmptyView>
-                <Label Text="Aucun élève pour ce cours." TextColor="#94a3b8"
+                <Label Text="Aucun élève pour cette réservation." TextColor="#94a3b8"
                        FontSize="14" HorizontalOptions="Center" Margin="0,40,0,0"/>
             </CollectionView.EmptyView>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Student">
+                <DataTemplate x:DataType="models:ReservationStudent">
                     <Frame Margin="0,0,0,10" Padding="14,12" CornerRadius="12"
                            BackgroundColor="White" HasShadow="False">
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8" VerticalOptions="Center">
@@ -74,8 +61,13 @@
                                 <Frame IsVisible="{Binding IsLate}"
                                        BackgroundColor="#fef3c7" CornerRadius="6"
                                        Padding="8,3" HasShadow="False" HorizontalOptions="Start">
-                                    <Label Text="Retard" TextColor="#92400e"
-                                           FontSize="12" FontAttributes="Bold"/>
+                                    <Label FontSize="12" FontAttributes="Bold" TextColor="#92400e">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="Retard {0}">
+                                                <Binding Path="DelayDisplay"/>
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
                                 </Frame>
 
                                 <Frame IsVisible="{Binding IsAbsentOnly}"
@@ -110,7 +102,7 @@
                                     Text="✏"
                                     Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.EditCommand}"
                                     CommandParameter="{Binding .}"
-                                    BackgroundColor="#64748b" TextColor="White"
+                                    BackgroundColor="#0d9488" TextColor="White"
                                     CornerRadius="8" FontSize="16"
                                     HeightRequest="38" WidthRequest="44"
                                     VerticalOptions="Center"/>
@@ -120,8 +112,8 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <ActivityIndicator Grid.Row="4" IsRunning="{Binding IsLoading}"
+        <ActivityIndicator Grid.Row="3" IsRunning="{Binding IsLoading}"
                            IsVisible="{Binding IsLoading}"
-                           Color="#263040" HorizontalOptions="Center" VerticalOptions="Center"/>
+                           Color="#0d9488" HorizontalOptions="Center" VerticalOptions="Center"/>
     </Grid>
 </ContentPage>

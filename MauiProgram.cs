@@ -24,18 +24,21 @@ public static class MauiProgram
         builder.Services.AddSingleton<CourseService>();
         builder.Services.AddSingleton<AbsenceService>();
         builder.Services.AddSingleton<RoomService>();
+        builder.Services.AddSingleton<ReservationAbsenceService>();
 
         // ViewModels
         builder.Services.AddSingleton<LoginViewModel>();
         builder.Services.AddSingleton<CoursesViewModel>();
         builder.Services.AddTransient<AttendanceViewModel>();
         builder.Services.AddSingleton<RoomViewModel>();
+        builder.Services.AddTransient<ReservationAttendanceViewModel>();
 
         // Views
         builder.Services.AddSingleton<LoginPage>();
         builder.Services.AddSingleton<CoursesPage>();
         builder.Services.AddTransient<AttendancePage>();
         builder.Services.AddSingleton<RoomPage>();
+        builder.Services.AddTransient<ReservationAttendancePage>();
 
 #if DEBUG
         builder.Logging.AddDebug();

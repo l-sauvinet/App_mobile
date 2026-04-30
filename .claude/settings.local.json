@@ -15,7 +15,12 @@
       "Bash(dotnet clean *)",
       "Bash(mysql *)",
       "Bash(where mysql *)",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(adb logcat *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(& \"C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" logcat -c; Start-Sleep -Seconds 2; Write-Host \"Logcat cleared\")",
+      "PowerShell(& \"C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" devices)"
     ]
   }
 }

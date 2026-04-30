@@ -50,6 +50,19 @@
                         </Frame>
                     </VerticalStackLayout>
 
+                    <!-- Classe -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Classe (optionnel)" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>
+                        <Frame Padding="4,0" CornerRadius="10" HasShadow="False"
+                               BorderColor="#e2e8f0" BackgroundColor="#f8fafc">
+                            <Picker ItemsSource="{Binding Classes}"
+                                    SelectedItem="{Binding SelectedClass}"
+                                    ItemDisplayBinding="{Binding Name}"
+                                    Title="Aucune classe"
+                                    BackgroundColor="Transparent"/>
+                        </Frame>
+                    </VerticalStackLayout>
+
                     <!-- Date -->
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Date" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>

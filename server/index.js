@@ -111,22 +111,36 @@ app.get('/api/teacher/courses', requireTeacher, async (req, res) => {
   }
 })
 
-// GET /api/teacher/courses/:id/students
+// GET /api/teacher/courses/:id/students?classId=X
 app.get('/api/teacher/courses/:id/students', requireTeacher, async (req, res) => {
   try {
     const courseId = req.params.id
-    const [rows] = await db.execute(
-      `SELECT s.id, s.first_name, s.last_name,
-              a.id AS absence_id, a.is_late
-       FROM student s
-       JOIN class cl ON cl.id = s.class_id
-       JOIN course c ON c.class_id = cl.id
-       LEFT JOIN absence a ON a.student_id = s.id AND a.course_id = c.id
-       WHERE c.id = ?
-       ORDER BY s.last_name, s.first_name`,
-      [courseId]
-    )
-    console.log(`[students] course=${courseId}`, rows.map(r => ({ id: r.id, absence_id: r.absence_id, is_late: r.is_late })))
+    const classId = req.query.classId ? parseInt(req.query.classId) : null
+
+    let rows
+    if (classId) {
+      ;[rows] = await db.execute(
+        `SELECT s.id, s.first_name, s.last_name,
+                a.id AS absence_id, a.is_late
+         FROM student s
+         LEFT JOIN absence a ON a.student_id = s.id AND a.course_id = ?
+         WHERE s.class_id = ?
+         ORDER BY s.last_name, s.first_name`,
+        [courseId, classId]
+      )
+    } else {
+      ;[rows] = await db.execute(
+        `SELECT s.id, s.first_name, s.last_name,
+                a.id AS absence_id, a.is_late
+         FROM student s
+         JOIN class cl ON cl.id = s.class_id
+         JOIN course c ON c.class_id = cl.id
+         LEFT JOIN absence a ON a.student_id = s.id AND a.course_id = c.id
+         WHERE c.id = ?
+         ORDER BY s.last_name, s.first_name`,
+        [courseId]
+      )
+    }
     res.json(rows)
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -158,10 +172,27 @@ app.delete('/api/teacher/absences/:id', requireTeacher, async (req, res) => {
   }
 })
 
+// GET /api/teacher/classes
+app.get('/api/teacher/classes', requireTeacher, async (req, res) => {
+  try {
+    const [rows] = await db.execute(
+      `SELECT DISTINCT cl.id, cl.name
+       FROM course c
+       JOIN class cl ON cl.id = c.class_id
+       WHERE c.teacher_id = ?
+       ORDER BY cl.name`,
+      [req.teacherId]
+    )
+    res.json(rows)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 // GET /api/teacher/rooms
 app.get('/api/teacher/rooms', requireTeacher, async (req, res) => {
   try {
-    const [rows] = await db.execute('SELECT id, name, capacity, building FROM room ORDER BY name')
+    const [rows] = await db.execute('SELECT id, name, capacity, type FROM room WHERE is_active = 1 ORDER BY name')
     res.json(rows)
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -172,10 +203,12 @@ app.get('/api/teacher/rooms', requireTeacher, async (req, res) => {
 app.get('/api/teacher/reservations', requireTeacher, async (req, res) => {
   try {
     const [rows] = await db.execute(
-      `SELECT rr.id, rr.room_id, r.name AS room_name, rr.start_datetime, rr.end_datetime, rr.reason
+      `SELECT rr.id, rr.room_id, r.name AS room_name, rr.start_datetime, rr.end_datetime, rr.reason,
+              rr.class_id, cl.name AS class_name
        FROM room_reservation rr
        JOIN room r ON r.id = rr.room_id
-       WHERE rr.teacher_id = ? AND rr.end_datetime >= NOW()
+       LEFT JOIN class cl ON cl.id = rr.class_id
+       WHERE rr.teacher_id = ? AND rr.start_datetime >= CURDATE()
        ORDER BY rr.start_datetime ASC`,
       [req.teacherId]
     )
@@ -187,7 +220,7 @@ app.get('/api/teacher/reservations', requireTeacher, async (req, res) => {
 
 // POST /api/teacher/reservations
 app.post('/api/teacher/reservations', requireTeacher, async (req, res) => {
-  const { roomId, startDatetime, endDatetime, reason } = req.body
+  const { roomId, startDatetime, endDatetime, reason, classId } = req.body
   try {
     const [conflict] = await db.execute(
       `SELECT id FROM room_reservation
@@ -198,10 +231,55 @@ app.post('/api/teacher/reservations', requireTeacher, async (req, res) => {
       return res.status(409).json({ message: 'La salle est déjà réservée sur ce créneau.' })
 
     await db.execute(
-      `INSERT INTO room_reservation (room_id, teacher_id, start_datetime, end_datetime, reason)
-       VALUES (?, ?, ?, ?, ?)`,
-      [roomId, req.teacherId, startDatetime, endDatetime, reason || '']
+      `INSERT INTO room_reservation (room_id, teacher_id, start_datetime, end_datetime, reason, class_id)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [roomId, req.teacherId, startDatetime, endDatetime, reason || '', classId || null]
     )
+    res.json({ success: true })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// GET /api/teacher/reservations/:id/students
+app.get('/api/teacher/reservations/:id/students', requireTeacher, async (req, res) => {
+  try {
+    const reservationId = req.params.id
+    const [rows] = await db.execute(
+      `SELECT s.id, s.first_name, s.last_name,
+              ra.id AS absence_id, ra.is_late, ra.delay_minutes
+       FROM room_reservation rr
+       JOIN student s ON s.class_id = rr.class_id
+       LEFT JOIN reservation_absence ra ON ra.student_id = s.id AND ra.reservation_id = rr.id
+       WHERE rr.id = ? AND rr.teacher_id = ?
+       ORDER BY s.last_name, s.first_name`,
+      [reservationId, req.teacherId]
+    )
+    res.json(rows)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// POST /api/teacher/reservation-absences
+app.post('/api/teacher/reservation-absences', requireTeacher, async (req, res) => {
+  const { studentId, reservationId, isLate, delayMinutes } = req.body
+  try {
+    const [result] = await db.execute(
+      `INSERT INTO reservation_absence (student_id, reservation_id, is_late, delay_minutes, recorded_at)
+       VALUES (?, ?, ?, ?, NOW())`,
+      [studentId, reservationId, isLate ? 1 : 0, delayMinutes || 0]
+    )
+    res.json({ success: true, absenceId: result.insertId })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
+// DELETE /api/teacher/reservation-absences/:id
+app.delete('/api/teacher/reservation-absences/:id', requireTeacher, async (req, res) => {
+  try {
+    await db.execute('DELETE FROM reservation_absence WHERE id = ?', [req.params.id])
     res.json({ success: true })
   } catch (err) {
     res.status(500).json({ message: err.message })

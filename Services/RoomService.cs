@@ -20,7 +20,7 @@ public class RoomService
             Id = r.Id,
             Name = r.Name,
             Capacity = r.Capacity ?? 0,
-            Building = r.Building ?? ""
+            Type = r.Type ?? ""
         }).ToList() ?? [];
     }
 
@@ -34,18 +34,21 @@ public class RoomService
             RoomName = r.RoomName,
             StartDatetime = r.StartDatetime,
             EndDatetime = r.EndDatetime,
-            Reason = r.Reason ?? ""
+            Reason = r.Reason ?? "",
+            ClassId = r.ClassId,
+            ClassName = r.ClassName ?? ""
         }).ToList() ?? [];
     }
 
-    public async Task CreateReservationAsync(int roomId, DateTime start, DateTime end, string reason)
+    public async Task CreateReservationAsync(int roomId, DateTime start, DateTime end, string reason, int? classId)
     {
         var resp = await _api.PostAsync("/api/teacher/reservations", new
         {
             roomId,
             startDatetime = start.ToString("yyyy-MM-dd HH:mm:ss"),
             endDatetime = end.ToString("yyyy-MM-dd HH:mm:ss"),
-            reason
+            reason,
+            classId
         });
 
         if (!resp.IsSuccessStatusCode)
@@ -65,7 +68,7 @@ public class RoomService
         [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("name")] string Name,
         [property: JsonPropertyName("capacity")] int? Capacity,
-        [property: JsonPropertyName("building")] string? Building);
+        [property: JsonPropertyName("type")] string? Type);
 
     private record ReservationDto(
         [property: JsonPropertyName("id")] int Id,
@@ -73,5 +76,7 @@ public class RoomService
         [property: JsonPropertyName("room_name")] string RoomName,
         [property: JsonPropertyName("start_datetime")] DateTime StartDatetime,
         [property: JsonPropertyName("end_datetime")] DateTime EndDatetime,
-        [property: JsonPropertyName("reason")] string? Reason);
+        [property: JsonPropertyName("reason")] string? Reason,
+        [property: JsonPropertyName("class_id")] int? ClassId,
+        [property: JsonPropertyName("class_name")] string? ClassName);
 }

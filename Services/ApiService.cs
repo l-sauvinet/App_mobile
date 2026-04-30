@@ -26,7 +26,11 @@ public class ApiService
     public async Task<T?> GetAsync<T>(string path)
     {
         var resp = await Http.GetAsync(path);
-        resp.EnsureSuccessStatusCode();
+        if (!resp.IsSuccessStatusCode)
+        {
+            var body = await resp.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"{(int)resp.StatusCode}: {body}", null, resp.StatusCode);
+        }
         return await resp.Content.ReadFromJsonAsync<T>();
     }
 

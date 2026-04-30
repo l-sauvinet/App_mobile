@@ -130,64 +130,108 @@
                 </Border>
             </Grid>
 
-            <!-- Liste des cours -->
+            <!-- Liste des cours et réservations -->
             <RefreshView Grid.Row="1" Command="{Binding LoadCoursesCommand}"
                          IsRefreshing="{Binding IsLoading}" RefreshColor="#263040">
-                <CollectionView ItemsSource="{Binding CoursesForDay}" Margin="0,4,0,16">
+                <ScrollView>
+                    <VerticalStackLayout Margin="0,4,0,16" Spacing="0">
 
-                    <CollectionView.EmptyView>
-                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center"
-                                             Spacing="8" Margin="0,80,0,0">
+                        <!-- État vide -->
+                        <VerticalStackLayout IsVisible="{Binding IsEmpty}"
+                                             HorizontalOptions="Center" Spacing="8" Margin="0,80,0,0">
                             <Label Text="Pas de cours ce jour" TextColor="#94a3b8"
                                    FontSize="15" HorizontalOptions="Center"/>
                             <Label Text="Tirez vers le bas pour actualiser"
                                    TextColor="#cbd5e1" FontSize="12" HorizontalOptions="Center"/>
                         </VerticalStackLayout>
-                    </CollectionView.EmptyView>
 
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="models:Course">
-                            <Border Margin="16,0,16,12" BackgroundColor="White" StrokeThickness="0">
-                                <Border.StrokeShape>
-                                    <RoundRectangle CornerRadius="14"/>
-                                </Border.StrokeShape>
-                                <Border.GestureRecognizers>
-                                    <TapGestureRecognizer
-                                        Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectCourseCommand}"
-                                        CommandParameter="{Binding .}"/>
-                                </Border.GestureRecognizers>
-                                <Grid ColumnDefinitions="5,*,Auto" ColumnSpacing="0">
+                        <!-- Cours -->
+                        <VerticalStackLayout BindableLayout.ItemsSource="{Binding CoursesForDay}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate x:DataType="models:Course">
+                                    <Border Margin="16,0,16,12" BackgroundColor="White" StrokeThickness="0">
+                                        <Border.StrokeShape>
+                                            <RoundRectangle CornerRadius="14"/>
+                                        </Border.StrokeShape>
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer
+                                                Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectCourseCommand}"
+                                                CommandParameter="{Binding .}"/>
+                                        </Border.GestureRecognizers>
+                                        <Grid ColumnDefinitions="5,*,Auto" ColumnSpacing="0">
+                                            <BoxView Grid.Column="0" BackgroundColor="#263040" CornerRadius="7"/>
+                                            <VerticalStackLayout Grid.Column="1" Padding="14,14,8,14" Spacing="5">
+                                                <Label Text="{Binding Display}" FontSize="15" FontAttributes="Bold"
+                                                       TextColor="#1e293b" LineBreakMode="TailTruncation"/>
+                                                <Label Text="{Binding RoomName}" FontSize="13" TextColor="#64748b"/>
+                                            </VerticalStackLayout>
+                                            <VerticalStackLayout Grid.Column="2" Padding="0,14,14,14"
+                                                                 VerticalOptions="Center" Spacing="4">
+                                                <Border StrokeThickness="0" Padding="8,4"
+                                                        BackgroundColor="#eff6ff" HorizontalOptions="End">
+                                                    <Border.StrokeShape>
+                                                        <RoundRectangle CornerRadius="8"/>
+                                                    </Border.StrokeShape>
+                                                    <Label Text="{Binding StartHour}" FontSize="13"
+                                                           FontAttributes="Bold" TextColor="#2563eb"/>
+                                                </Border>
+                                                <Label Text="{Binding Duration}" FontSize="12"
+                                                       TextColor="#94a3b8" HorizontalOptions="Center"/>
+                                            </VerticalStackLayout>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </VerticalStackLayout>
 
-                                    <!-- Barre accent gauche -->
-                                    <BoxView Grid.Column="0" BackgroundColor="#263040" CornerRadius="7"/>
-
-                                    <!-- Infos cours -->
-                                    <VerticalStackLayout Grid.Column="1" Padding="14,14,8,14" Spacing="5">
-                                        <Label Text="{Binding Display}" FontSize="15" FontAttributes="Bold"
-                                               TextColor="#1e293b" LineBreakMode="TailTruncation"/>
-                                        <Label Text="{Binding RoomName}" FontSize="13" TextColor="#64748b"/>
-                                    </VerticalStackLayout>
-
-                                    <!-- Heure + durée -->
-                                    <VerticalStackLayout Grid.Column="2" Padding="0,14,14,14"
-                                                         VerticalOptions="Center" Spacing="4">
-                                        <Border StrokeThickness="0" Padding="8,4"
-                                                BackgroundColor="#eff6ff" HorizontalOptions="End">
+                        <!-- Réservations de salle -->
+                        <VerticalStackLayout IsVisible="{Binding HasReservationsForDay}">
+                            <Label Text="Réservations" FontSize="13" FontAttributes="Bold"
+                                   TextColor="#64748b" Margin="20,4,20,8"/>
+                            <VerticalStackLayout BindableLayout.ItemsSource="{Binding ReservationsForDay}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:RoomReservation">
+                                        <Border Margin="16,0,16,12" BackgroundColor="White" StrokeThickness="0">
                                             <Border.StrokeShape>
-                                                <RoundRectangle CornerRadius="8"/>
+                                                <RoundRectangle CornerRadius="14"/>
                                             </Border.StrokeShape>
-                                            <Label Text="{Binding StartHour}" FontSize="13"
-                                                   FontAttributes="Bold" TextColor="#2563eb"/>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer
+                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type ContentPage}}, Path=BindingContext.SelectReservationCommand}"
+                                                    CommandParameter="{Binding .}"/>
+                                            </Border.GestureRecognizers>
+                                            <Grid ColumnDefinitions="5,*,Auto" ColumnSpacing="0">
+                                                <BoxView Grid.Column="0" BackgroundColor="#0d9488" CornerRadius="7"/>
+                                                <VerticalStackLayout Grid.Column="1" Padding="14,14,8,14" Spacing="5">
+                                                    <Label Text="{Binding RoomName}" FontSize="15" FontAttributes="Bold"
+                                                           TextColor="#1e293b" LineBreakMode="TailTruncation"/>
+                                                    <Label Text="{Binding ClassName}" FontSize="12" TextColor="#0d9488"
+                                                           IsVisible="{Binding ClassName, Converter={StaticResource IsNotEmptyConverter}}"/>
+                                                    <Label Text="{Binding Reason}" FontSize="13" TextColor="#64748b"
+                                                           IsVisible="{Binding Reason, Converter={StaticResource IsNotEmptyConverter}}"/>
+                                                </VerticalStackLayout>
+                                                <VerticalStackLayout Grid.Column="2" Padding="0,14,14,14"
+                                                                     VerticalOptions="Center" Spacing="4">
+                                                    <Border StrokeThickness="0" Padding="8,4"
+                                                            BackgroundColor="#ccfbf1" HorizontalOptions="End">
+                                                        <Border.StrokeShape>
+                                                            <RoundRectangle CornerRadius="8"/>
+                                                        </Border.StrokeShape>
+                                                        <Label Text="{Binding StartHour}" FontSize="13"
+                                                               FontAttributes="Bold" TextColor="#0d9488"/>
+                                                    </Border>
+                                                    <Label Text="{Binding Duration}" FontSize="12"
+                                                           TextColor="#94a3b8" HorizontalOptions="Center"/>
+                                                </VerticalStackLayout>
+                                            </Grid>
                                         </Border>
-                                        <Label Text="{Binding Duration}" FontSize="12"
-                                               TextColor="#94a3b8" HorizontalOptions="Center"/>
-                                    </VerticalStackLayout>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
 
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
+                    </VerticalStackLayout>
+                </ScrollView>
             </RefreshView>
 
             <!-- Loader -->

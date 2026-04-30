@@ -13,9 +13,18 @@ public class AbsenceService
         _api = api;
     }
 
-    public async Task<List<Student>> GetStudentsForCourseAsync(int courseId)
+    public async Task<List<SchoolClass>> GetTeacherClassesAsync()
     {
-        var rows = await _api.GetAsync<List<StudentDto>>($"/api/teacher/courses/{courseId}/students");
+        var rows = await _api.GetAsync<List<ClassDto>>("/api/teacher/classes");
+        return rows?.Select(r => new SchoolClass { Id = r.Id, Name = r.Name }).ToList() ?? [];
+    }
+
+    public async Task<List<Student>> GetStudentsForCourseAsync(int courseId, int? classId = null)
+    {
+        var path = classId.HasValue
+            ? $"/api/teacher/courses/{courseId}/students?classId={classId}"
+            : $"/api/teacher/courses/{courseId}/students";
+        var rows = await _api.GetAsync<List<StudentDto>>(path);
         return rows?.Select(r => new Student
         {
             Id = r.Id,
@@ -42,6 +51,9 @@ public class AbsenceService
     }
 
     private record AbsenceResultDto([property: JsonPropertyName("absenceId")] int AbsenceId);
+    private record ClassDto(
+        [property: JsonPropertyName("id")] int Id,
+        [property: JsonPropertyName("name")] string Name);
     private record StudentDto(
         [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("first_name")] string FirstName,

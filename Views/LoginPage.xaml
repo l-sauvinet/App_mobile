@@ -22,15 +22,14 @@
 
                 <!-- Logo -->
                 <VerticalStackLayout Spacing="12" HorizontalOptions="Center">
-                    <Frame WidthRequest="56" HeightRequest="56"
-                           CornerRadius="14"
+                    <Frame WidthRequest="90" HeightRequest="90"
+                           CornerRadius="18"
                            BackgroundColor="#263040"
-                           Padding="0"
+                           Padding="14"
                            HasShadow="False"
                            HorizontalOptions="Center">
-                        <!-- Remplace par ton image d'icône réelle -->
-                        <Image Source="app_icon.png"
-                               WidthRequest="28" HeightRequest="28"
+                        <Image Source="logo_app.svg"
+                               WidthRequest="62" HeightRequest="62"
                                HorizontalOptions="Center"
                                VerticalOptions="Center"/>
                     </Frame>

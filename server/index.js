@@ -286,6 +286,23 @@ app.delete('/api/teacher/reservation-absences/:id', requireTeacher, async (req, 
   }
 })
 
+// GET /api/teacher/rooms/availability?roomId=X&start=...&end=...
+app.get('/api/teacher/rooms/availability', requireTeacher, async (req, res) => {
+  const { roomId, start, end } = req.query
+  if (!roomId || !start || !end)
+    return res.status(400).json({ message: 'Paramètres manquants.' })
+  try {
+    const [conflict] = await db.execute(
+      `SELECT id FROM room_reservation
+       WHERE room_id = ? AND start_datetime < ? AND end_datetime > ?`,
+      [roomId, end, start]
+    )
+    res.json({ available: conflict.length === 0 })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+})
+
 // DELETE /api/teacher/reservations/:id
 app.delete('/api/teacher/reservations/:id', requireTeacher, async (req, res) => {
   try {

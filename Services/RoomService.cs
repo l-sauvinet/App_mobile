@@ -58,11 +58,22 @@ public class RoomService
         }
     }
 
+    public async Task<bool> CheckAvailabilityAsync(int roomId, DateTime start, DateTime end)
+    {
+        var url = $"/api/teacher/rooms/availability?roomId={roomId}" +
+                  $"&start={Uri.EscapeDataString(start.ToString("yyyy-MM-dd HH:mm:ss"))}" +
+                  $"&end={Uri.EscapeDataString(end.ToString("yyyy-MM-dd HH:mm:ss"))}";
+        var result = await _api.GetAsync<AvailabilityDto>(url);
+        return result?.Available ?? false;
+    }
+
     public async Task DeleteReservationAsync(int reservationId)
     {
         var resp = await _api.DeleteAsync($"/api/teacher/reservations/{reservationId}");
         resp.EnsureSuccessStatusCode();
     }
+
+    private record AvailabilityDto([property: JsonPropertyName("available")] bool Available);
 
     private record RoomDto(
         [property: JsonPropertyName("id")] int Id,

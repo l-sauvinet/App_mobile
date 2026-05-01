@@ -92,6 +92,18 @@
                         </VerticalStackLayout>
                     </Grid>
 
+                    <!-- Disponibilité -->
+                    <Frame IsVisible="{Binding IsAvailableVisible}"
+                           BackgroundColor="#dcfce7" Padding="12,8" CornerRadius="8" HasShadow="False">
+                        <Label Text="✓  Salle disponible sur ce créneau"
+                               TextColor="#16a34a" FontSize="13" FontAttributes="Bold"/>
+                    </Frame>
+                    <Frame IsVisible="{Binding IsUnavailableVisible}"
+                           BackgroundColor="#fee2e2" Padding="12,8" CornerRadius="8" HasShadow="False">
+                        <Label Text="✗  Salle non disponible sur ce créneau"
+                               TextColor="#dc2626" FontSize="13" FontAttributes="Bold"/>
+                    </Frame>
+
                     <!-- Motif -->
                     <VerticalStackLayout Spacing="6">
                         <Label Text="Motif (optionnel)" FontSize="13" TextColor="#475569" FontAttributes="Bold"/>

@@ -24,11 +24,50 @@ public partial class RoomViewModel : ObservableObject
     [ObservableProperty] private bool _isLoading;
     [ObservableProperty] private string _errorMessage = string.Empty;
     [ObservableProperty] private string _successMessage = string.Empty;
+    [ObservableProperty] private bool _isAvailableVisible;
+    [ObservableProperty] private bool _isUnavailableVisible;
+
+    private CancellationTokenSource? _availabilityCts;
 
     public RoomViewModel(RoomService roomService, AbsenceService absenceService)
     {
         _roomService = roomService;
         _absenceService = absenceService;
+    }
+
+    partial void OnSelectedRoomChanged(Room? value) => _ = TriggerAvailabilityCheckAsync();
+    partial void OnSelectedDateChanged(DateTime value) => _ = TriggerAvailabilityCheckAsync();
+    partial void OnStartTimeChanged(TimeSpan value) => _ = TriggerAvailabilityCheckAsync();
+    partial void OnEndTimeChanged(TimeSpan value) => _ = TriggerAvailabilityCheckAsync();
+
+    private async Task TriggerAvailabilityCheckAsync()
+    {
+        _availabilityCts?.Cancel();
+        _availabilityCts = new CancellationTokenSource();
+        var token = _availabilityCts.Token;
+
+        IsAvailableVisible = false;
+        IsUnavailableVisible = false;
+
+        if (SelectedRoom == null) return;
+
+        var start = SelectedDate.Date + StartTime;
+        var end = SelectedDate.Date + EndTime;
+        if (end <= start) return;
+
+        try
+        {
+            await Task.Delay(500, token);
+            if (token.IsCancellationRequested) return;
+
+            var available = await _roomService.CheckAvailabilityAsync(SelectedRoom.Id, start, end);
+            if (token.IsCancellationRequested) return;
+
+            IsAvailableVisible = available;
+            IsUnavailableVisible = !available;
+        }
+        catch (OperationCanceledException) { }
+        catch { }
     }
 
     [RelayCommand]

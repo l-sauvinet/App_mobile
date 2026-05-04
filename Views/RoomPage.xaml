@@ -7,7 +7,7 @@
              x:Class="AppMobile.Views.RoomPage"
              x:DataType="vm:RoomViewModel"
              BackgroundColor="#f3f4f6"
-             Title="Réservation de salle">
+             Title="Gestion des cours">
 
     <ScrollView>
         <VerticalStackLayout Spacing="0">
@@ -15,8 +15,8 @@
             <!-- Header navy -->
             <Frame BackgroundColor="#263040" CornerRadius="0" Padding="20,16" HasShadow="False">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Réserver une salle" FontSize="22" FontAttributes="Bold" TextColor="White"/>
-                    <Label Text="Gérez vos réservations de salles" FontSize="13" TextColor="#94a3b8"/>
+                    <Label Text="Créer un cours" FontSize="22" FontAttributes="Bold" TextColor="White"/>
+                    <Label Text="Gérez vos cours et salles" FontSize="13" TextColor="#94a3b8"/>
                 </VerticalStackLayout>
             </Frame>
 
@@ -30,11 +30,11 @@
                 <Label Text="{Binding ErrorMessage}" TextColor="#dc2626" FontSize="13"/>
             </Frame>
 
-            <!-- Formulaire de réservation -->
+            <!-- Formulaire -->
             <Frame Margin="16,16,16,0" Padding="20" CornerRadius="14"
                    BackgroundColor="White" HasShadow="False">
                 <VerticalStackLayout Spacing="16">
-                    <Label Text="Nouvelle réservation" FontSize="17"
+                    <Label Text="Nouveau cours" FontSize="17"
                            FontAttributes="Bold" TextColor="#1e293b"/>
 
                     <!-- Salle -->
@@ -114,23 +114,23 @@
                         </Frame>
                     </VerticalStackLayout>
 
-                    <Button Text="Réserver" Command="{Binding ReserveCommand}"
+                    <Button Text="Valider le cours" Command="{Binding ReserveCommand}"
                             BackgroundColor="#263040" TextColor="White"
                             CornerRadius="10" HeightRequest="50"
                             FontAttributes="Bold" FontSize="16"/>
                 </VerticalStackLayout>
             </Frame>
 
-            <!-- Mes réservations -->
+            <!-- Mes cours -->
             <Frame Margin="16,16,16,16" Padding="20" CornerRadius="14"
                    BackgroundColor="White" HasShadow="False">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Mes réservations à venir" FontSize="17"
+                    <Label Text="Mes cours à venir" FontSize="17"
                            FontAttributes="Bold" TextColor="#1e293b"/>
 
                     <CollectionView ItemsSource="{Binding MyReservations}">
                         <CollectionView.EmptyView>
-                            <Label Text="Aucune réservation à venir." TextColor="#94a3b8"
+                            <Label Text="Aucun cours à venir." TextColor="#94a3b8"
                                    FontSize="14" HorizontalOptions="Center" Margin="0,8"/>
                         </CollectionView.EmptyView>
                         <CollectionView.ItemTemplate>

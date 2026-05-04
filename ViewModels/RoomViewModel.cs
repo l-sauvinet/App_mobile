@@ -79,7 +79,7 @@ public partial class RoomViewModel : ObservableObject
         try
         {
             var roomsTask = _roomService.GetRoomsAsync();
-            var classesTask = _absenceService.GetTeacherClassesAsync();
+            var classesTask = _absenceService.GetAllClassesAsync();
             await Task.WhenAll(roomsTask, classesTask);
 
             Rooms = new ObservableCollection<Room>(roomsTask.Result);
@@ -134,7 +134,7 @@ public partial class RoomViewModel : ObservableObject
             await LoadReservationsAsync();
             Reason = string.Empty;
             SelectedClass = null;
-            ShowSuccess("Réservation confirmée !");
+            ShowSuccess("Cours validé !");
         }
         catch (Exception ex)
         {
@@ -157,7 +157,7 @@ public partial class RoomViewModel : ObservableObject
     [RelayCommand]
     private async Task DeleteReservationAsync(RoomReservation reservation)
     {
-        bool confirm = await Shell.Current.DisplayAlert("Annuler", $"Annuler la réservation de {reservation.RoomName} ?", "Oui", "Non");
+        bool confirm = await Shell.Current.DisplayAlert("Supprimer", $"Supprimer le cours en salle {reservation.RoomName} ?", "Oui", "Non");
         if (!confirm) return;
 
         try

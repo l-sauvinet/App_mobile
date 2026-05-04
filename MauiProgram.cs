@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using AppMobile.Services;
 using AppMobile.ViewModels;
 using AppMobile.Views;
+using System.Globalization;
 
 namespace AppMobile;
 
@@ -9,6 +10,10 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        var fr = new CultureInfo("fr-FR");
+        CultureInfo.DefaultThreadCurrentCulture = fr;
+        CultureInfo.DefaultThreadCurrentUICulture = fr;
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()

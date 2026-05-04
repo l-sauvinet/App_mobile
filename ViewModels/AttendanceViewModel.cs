@@ -84,7 +84,7 @@ public partial class AttendanceViewModel : ObservableObject
             student.IsLate = false;
             ShowSuccess("Absence enregistrée.");
         }
-        catch { ErrorMessage = "Erreur lors de l'enregistrement."; }
+        catch (Exception ex) { ErrorMessage = ex.Message; }
     }
 
     [RelayCommand]
@@ -98,7 +98,7 @@ public partial class AttendanceViewModel : ObservableObject
             student.IsLate = true;
             ShowSuccess("Retard enregistré.");
         }
-        catch { ErrorMessage = "Erreur lors de l'enregistrement."; }
+        catch (Exception ex) { ErrorMessage = ex.Message; }
     }
 
     [RelayCommand]

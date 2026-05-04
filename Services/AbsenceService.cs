@@ -19,6 +19,12 @@ public class AbsenceService
         return rows?.Select(r => new SchoolClass { Id = r.Id, Name = r.Name }).ToList() ?? [];
     }
 
+    public async Task<List<SchoolClass>> GetAllClassesAsync()
+    {
+        var rows = await _api.GetAsync<List<ClassDto>>("/api/teacher/all-classes");
+        return rows?.Select(r => new SchoolClass { Id = r.Id, Name = r.Name }).ToList() ?? [];
+    }
+
     public async Task<List<Student>> GetStudentsForCourseAsync(int courseId, int? classId = null)
     {
         var path = classId.HasValue
@@ -39,7 +45,11 @@ public class AbsenceService
     public async Task<int> RecordAbsenceAsync(int studentId, int courseId, bool isLate)
     {
         var resp = await _api.PostAsync("/api/teacher/absences", new { studentId, courseId, isLate });
-        resp.EnsureSuccessStatusCode();
+        if (!resp.IsSuccessStatusCode)
+        {
+            var err = await resp.Content.ReadFromJsonAsync<ErrorDto>();
+            throw new Exception(err?.Message ?? "Erreur lors de l'enregistrement.");
+        }
         var body = await resp.Content.ReadFromJsonAsync<AbsenceResultDto>();
         return body?.AbsenceId ?? 0;
     }
@@ -51,6 +61,7 @@ public class AbsenceService
     }
 
     private record AbsenceResultDto([property: JsonPropertyName("absenceId")] int AbsenceId);
+    private record ErrorDto([property: JsonPropertyName("message")] string? Message);
     private record ClassDto(
         [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("name")] string Name);

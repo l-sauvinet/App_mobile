@@ -61,7 +61,7 @@ public partial class ReservationAttendanceViewModel : ObservableObject
             student.DelayMinutes = 0;
             ShowSuccess("Absence enregistrée.");
         }
-        catch { ErrorMessage = "Erreur lors de l'enregistrement."; }
+        catch (Exception ex) { ErrorMessage = ex.Message; }
     }
 
     [RelayCommand]
@@ -87,7 +87,7 @@ public partial class ReservationAttendanceViewModel : ObservableObject
             student.DelayMinutes = minutes;
             ShowSuccess("Retard enregistré.");
         }
-        catch { ErrorMessage = "Erreur lors de l'enregistrement."; }
+        catch (Exception ex) { ErrorMessage = ex.Message; }
     }
 
     [RelayCommand]

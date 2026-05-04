@@ -32,7 +32,11 @@ public class ReservationAbsenceService
     {
         var resp = await _api.PostAsync("/api/teacher/reservation-absences",
             new { studentId, reservationId, isLate, delayMinutes });
-        resp.EnsureSuccessStatusCode();
+        if (!resp.IsSuccessStatusCode)
+        {
+            var err = await resp.Content.ReadFromJsonAsync<ErrorDto>();
+            throw new Exception(err?.Message ?? "Erreur lors de l'enregistrement.");
+        }
         var body = await resp.Content.ReadFromJsonAsync<ResultDto>();
         return body?.AbsenceId ?? 0;
     }
@@ -44,6 +48,7 @@ public class ReservationAbsenceService
     }
 
     private record ResultDto([property: JsonPropertyName("absenceId")] int AbsenceId);
+    private record ErrorDto([property: JsonPropertyName("message")] string? Message);
     private record StudentDto(
         [property: JsonPropertyName("id")] int Id,
         [property: JsonPropertyName("first_name")] string FirstName,

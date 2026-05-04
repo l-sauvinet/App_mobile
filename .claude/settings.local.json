@@ -20,7 +20,14 @@
       "Bash(adb logcat *)",
       "PowerShell(Get-ChildItem *)",
       "PowerShell(& \"C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" logcat -c; Start-Sleep -Seconds 2; Write-Host \"Logcat cleared\")",
-      "PowerShell(& \"C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" devices)"
+      "PowerShell(& \"C:\\\\Users\\\\lucas\\\\AppData\\\\Local\\\\Android\\\\Sdk\\\\platform-tools\\\\adb.exe\" devices)",
+      "Bash(Get-ChildItem -Path \"E:\\\\Dev\\\\App_mobile\" -Recurse -Directory)",
+      "Bash(Select-Object -First 30 FullName)",
+      "PowerShell(Get-ChildItem -Path \"E:\\\\Dev\\\\App_mobile\" -Recurse -Directory | Where-Object { $_.Name -match \"backend|server|api\" } | Select-Object FullName)",
+      "Bash(Get-ChildItem E:\\\\Dev\\\\App_mobile *)",
+      "PowerShell(Get-ChildItem \"E:\\\\Dev\\\\App_mobile\" | Select-Object Name, @{Name=\"Type\";Expression={if\\($_.PSIsContainer\\){\"Folder\"}else{\"File\"}}})",
+      "PowerShell(Get-ChildItem -Path \"E:\\\\Dev\\\\App_mobile\" -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem -Path \"E:\\\\Dev\\\\App_mobile\\\\server\" -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })"
     ]
   }
 }
